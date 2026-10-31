@@ -1,16 +1,15 @@
-from src.scraper import fetch_page, parse_product
+import json
+from src.scraper import scrape_catalog
 
 
 def main():
-    url = "https://books.toscrape.com/"
+    books = scrape_catalog()
 
-    try:
-        html = fetch_page(url)
-        product = parse_product(html)
+    print(f"Scraped {len(books)} books.")
 
-        print(product)
-    except Exception as e:
-        print(f"An error occurred: {e}")
+    with open("books.json", "w", encoding="utf-8") as f:
+        json.dump(books, f, ensure_ascii=False, indent=2)
+    
 
 if __name__ == "__main__":
     main()
