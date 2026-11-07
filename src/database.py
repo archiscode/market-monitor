@@ -14,15 +14,28 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 load_dotenv(PROJECT_ROOT / ".env")
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+
+def get_database_url():
+    database_url = os.getenv("DATABASE_URL")
+
+    if database_url:
+        return database_url
+
+    try:
+        import streamlit as st
+        database_url = st.secrets["DATABASE_URL"]
+    except Exception as exc:
+        raise RuntimeError(
+            "DATABASE_URL is not configured. "
+            "Set it in the environment or Streamlit secrets."
+        ) from exc
+
+    return database_url
 
 
 def get_connection():
-    if not DATABASE_URL:
-        raise ValueError("DATABASE_URL not found in environment.")
-
     return psycopg.connect(
-        DATABASE_URL,
+        get_database_url(),
         row_factory=dict_row
     )
 
