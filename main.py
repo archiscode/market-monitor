@@ -1,15 +1,29 @@
-import json
-from src.scraper import scrape_catalog
+import logging
+
+from src.companies_house import get_yesterdays_companies
+from src.database import (
+    initialize_database,
+    save_companies,
+    get_company_count
+)
 
 
 def main():
-    books = scrape_catalog()
+    logging.info("Starting Companies House collector.")
 
-    print(f"Scraped {len(books)} books.")
+    initialize_database()
 
-    with open("books.json", "w", encoding="utf-8") as f:
-        json.dump(books, f, ensure_ascii=False, indent=2)
-    
+    companies = get_yesterdays_companies()
+
+    save_companies(companies)
+
+    total = get_company_count()
+
+    print("\nCollection completed.")
+    print(f"Companies retrieved: {len(companies)}")
+    print(f"Total companies in database: {total}")
+
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     main()
